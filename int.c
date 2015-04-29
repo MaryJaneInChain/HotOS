@@ -2,6 +2,7 @@
 
 /* 头文件 */
 
+#include <stdio.h>
 #include "bootpack.h"
 
 /* 函数定义 */
