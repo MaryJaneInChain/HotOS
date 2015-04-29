@@ -104,7 +104,16 @@ void inthandler2c(int *esp);
 
 #define PORT_KEYDAT		0x0060//从编号为0x0060的设备输入的8位信息是按键编码
 
-struct KEYBUF{
-	unsigned char data[32];
-	int next;
+//fifo.c
+
+struct FIFO8{
+	unsigned char *buf;
+	int p,q,size,free,flags;
 };
+
+void fifo8_init(struct FIFO8 *fifo,int size,unsigned char *buf);
+int fifo8_put(struct FIFO8 *fifo,unsigned char data);
+int fifo8_get(struct FIFO8 *fifo);
+int fifo8_status(struct FIFO8 *fifo);
+
+#define FLAGS_OVERRUN	0x0001;

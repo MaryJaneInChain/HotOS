@@ -6,6 +6,8 @@
 
 /* 函数定义 */
 
+struct FIFO8 keyfifo;
+
 void init_pic(void){
 	//初始化PIC
 	io_out8(PIC0_IMR,0xff);//禁止所有中断
@@ -32,10 +34,7 @@ void inthandler21(int *esp){
 	unsigned char data;
 	io_out8(PIC0_OCW2,0x61);//通知PIC：IRQ-01已经受理完毕
 	data=io_in8(PORT_KEYDAT);
-	if(keybuf.next<32){
-		keybuf.data[keybuf.next]=data;
-		keybuf.next++;
-	}
+	fifo8_put(&keyfifo,data);
 	return;
 }
 
