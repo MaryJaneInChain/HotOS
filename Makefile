@@ -1,4 +1,4 @@
-TOOLPATH = ../z_tools/
+TOOLPATH = ./z_tools/
 INCPATH  = ../z_tools/haribote/
 
 MAKE     = $(TOOLPATH)make.exe -r
