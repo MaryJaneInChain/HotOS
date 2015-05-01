@@ -26,6 +26,8 @@
 
 /* 函数定义 */
 
+extern char mcursor[16][16];
+
 void init_palette(void){
 	static unsigned char table_rgb[16*3]={
 		0x00,0x00,0x00, //0:黑
@@ -74,7 +76,6 @@ void boxfill8(unsigned char *vram,int xsize,unsigned char c,int x0,int y0,int x1
 
 void init_screen(unsigned char *vram,int xsize,int ysize){
 	char s[40];
-	char mcursor[16][16];
 
 	sprintf(s,"scrnX = %d  scrnY = %d",xsize,ysize);
 
@@ -84,7 +85,7 @@ void init_screen(unsigned char *vram,int xsize,int ysize){
 	boxfill8(vram,xsize,COL8_C6C6C6,0,ysize-11,xsize-1,ysize-1);
 
 	putfont8_asc_shadow(vram,xsize,8,8,COL8_FFFFFF,"Heart of Truth OS");
-	putfont8_asc_shadow(vram,xsize,8,40,COL8_FFFFFF,s);
+	putfont8_asc_shadow(vram,xsize,8,56,COL8_FFFFFF,s);
 
 	init_mouse_cursor8(mcursor,COL8_008484);
 

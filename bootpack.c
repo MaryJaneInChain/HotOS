@@ -6,11 +6,14 @@
 /* 代码主体 */
 
 extern struct FIFO8 keyfifo,mousefifo;
+extern struct MOUSE_DEC mdec;
+
+char mcursor[16][16];
 
 void HariMain(void){
 	struct BOOTINFO *binfo=(struct BOOTINFO *)ADR_BOOTINFO;
-	int i;
-	char s[40],mcursor[256],keybuf[32],mousebuf[128];
+	int i,mx=(binfo->scrnx-16)/2,my=(binfo->scrny-16)/2;
+	char s[40],keybuf[32],mousebuf[128];
 
 	init_gdtidt();
 	init_pic();
@@ -26,9 +29,11 @@ void HariMain(void){
 	init_keyboard();
 
 	init_palette(); //设定调色板
-	init_screen(binfo->vram,binfo->scrnx,binfo->scrny);
+	init_mouse_cursor8(mcursor,COL8_008484);
 
-	enable_mouse();
+	enable_mouse(&mdec);
+
+	init_screen(binfo->vram,binfo->scrnx,binfo->scrny);
 
 	for(;;){
 		io_cli();
@@ -39,14 +44,47 @@ void HariMain(void){
 				i=fifo8_get(&keyfifo);
 				io_sti();
 				sprintf(s,"%02X",i);
-				boxfill8(binfo->vram,binfo->scrnx,COL8_008484,8,8,binfo->scrnx-8,23);
-				putfont8_asc_shadow(binfo->vram,binfo->scrnx,8,8,COL8_FFFFFF,s);
+				boxfill8(binfo->vram,binfo->scrnx,COL8_008484,8,24,binfo->scrnx-8,39);
+				putfont8_asc_shadow(binfo->vram,binfo->scrnx,8,24,COL8_FFFFFF,s);
 			}else if(fifo8_status(&mousefifo)!=0){
 				i=fifo8_get(&mousefifo);
 				io_sti();
-				sprintf(s,"%02X",i);
-				boxfill8(binfo->vram,binfo->scrnx,COL8_008484,8,24,binfo->scrnx-8,39);
-				putfont8_asc_shadow(binfo->vram,binfo->scrnx,8,24,COL8_FFFFFF,s);
+				if(mouse_decode(&mdec,i)==1){
+					//鼠标的三个字节都齐了，显示出来
+					sprintf(s,"[lcr,%4d,%4d]",mdec.x,mdec.y);
+					//如果鼠标按键被按下，则将相应的字母变为大写
+					if((mdec.btn&0x01)!=0){
+						s[1]='L';
+					}
+					if((mdec.btn&0x02)!=0){
+						s[3]='R';
+					}
+					if((mdec.btn&0x04)!=0){
+						s[2]='C';
+					}
+					boxfill8(binfo->vram,binfo->scrnx,COL8_008484,8,40,159,55);
+					putfont8_asc_shadow(binfo->vram,binfo->scrnx,8,40,COL8_FFFFFF,s);
+					//鼠标指针的移动
+					boxfill8(binfo->vram,binfo->scrnx,COL8_008484,mx,my,mx+15,my+15);//隐藏上一帧的鼠标
+					mx+=mdec.x;
+					my+=mdec.y;
+					if(mx<0){
+						mx=0;
+					}
+					if(my<0){
+						my=0;
+					}
+					if(mx>binfo->scrnx-16){
+						mx=binfo->scrnx-16;
+					}
+					if(my>binfo->scrny-16){
+						my=binfo->scrny-16;
+					}
+					sprintf(s,"(%3d, %3d)",mx,my);
+					boxfill8(binfo->vram,binfo->scrnx,COL8_008484,160,40,312,55);
+					putfont8_asc_shadow(binfo->vram,binfo->scrnx,160,40,COL8_FFFFFF,s);//显示鼠标坐标
+					putblock8_8(binfo->vram,binfo->scrnx,16,16,mx,my,mcursor,16);//描绘鼠标
+				}
 			}
 		}
 	}
