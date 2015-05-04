@@ -65,8 +65,8 @@ asmhead.bin: asmhead.nas Makefile
 %.obj: %.nas Makefile
 	$(NASK) $*.nas $*.obj
 
-bootpack.bim: bootpack.obj naskfunc.obj graphic.obj dsctbl.obj int.obj fifo.obj hankaku.obj Makefile
-	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map bootpack.obj graphic.obj dsctbl.obj int.obj fifo.obj naskfunc.obj hankaku.obj
+bootpack.bim: bootpack.obj naskfunc.obj graphic.obj dsctbl.obj int.obj fifo.obj hankaku.obj mouse.obj keyboard.obj Makefile
+	$(OBJ2BIM) @$(RULEFILE) out:bootpack.bim stack:3136k map:bootpack.map bootpack.obj graphic.obj dsctbl.obj int.obj fifo.obj naskfunc.obj hankaku.obj mouse.obj keyboard.obj
 # 3MB+64KB=3136KB
 
 bootpack.hrb: bootpack.bim Makefile

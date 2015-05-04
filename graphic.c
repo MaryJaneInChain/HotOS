@@ -26,6 +26,8 @@
 
 /* 函数定义 */
 
+extern struct MEMMAN *memman;
+extern unsigned int memtotal;
 extern char mcursor[16][16];
 
 void init_palette(void){
@@ -75,8 +77,9 @@ void boxfill8(unsigned char *vram,int xsize,unsigned char c,int x0,int y0,int x1
 }
 
 void init_screen(unsigned char *vram,int xsize,int ysize){
-	char s[40];
+	char m[40],s[40];
 
+	sprintf(m,"memory = %d MB  free = %d KB",memtotal/(1024*1024),memman_total(memman)/1024);
 	sprintf(s,"scrnX = %d  scrnY = %d",xsize,ysize);
 
 	boxfill8(vram,xsize,COL8_008484,0,0,xsize-1,ysize-14);
@@ -84,7 +87,7 @@ void init_screen(unsigned char *vram,int xsize,int ysize){
 	boxfill8(vram,xsize,COL8_FFFFFF,0,ysize-12,xsize-1,ysize-12);
 	boxfill8(vram,xsize,COL8_C6C6C6,0,ysize-11,xsize-1,ysize-1);
 
-	putfont8_asc_shadow(vram,xsize,8,8,COL8_FFFFFF,"Heart of Truth OS");
+	putfont8_asc_shadow(vram,xsize,8,8,COL8_FFFFFF,m);
 	putfont8_asc_shadow(vram,xsize,8,56,COL8_FFFFFF,s);
 
 	init_mouse_cursor8(mcursor,COL8_008484);
