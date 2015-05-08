@@ -90,9 +90,9 @@ void init_screen(unsigned char *vram,int xsize,int ysize){
 	putfont8_asc_shadow(vram,xsize,8,8,COL8_FFFFFF,m);
 	putfont8_asc_shadow(vram,xsize,8,56,COL8_FFFFFF,s);
 
-	init_mouse_cursor8(mcursor,COL8_008484);
+	//init_mouse_cursor8(mcursor,COL8_008484);
 
-	putblock8_8(vram,xsize,16,16,152,92,mcursor,16);
+	//putblock8_8(vram,xsize,16,16,152,92,mcursor,16);
 
 	return;
 }

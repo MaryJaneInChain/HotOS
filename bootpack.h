@@ -28,7 +28,7 @@ int load_cr0(void);
 void store_cr0(int cr0);
 unsigned int memtest_sub(unsigned int start,unsigned int end);
 
-//bootpack.c
+//memory.c
 
 #define EFLAGS_AC_BIT		0x00040000
 #define CR0_CACHE_DISABLE	0x60000000
@@ -51,7 +51,9 @@ unsigned int memtest(unsigned int start,unsigned int end);
 void memman_init(struct MEMMAN *man);
 unsigned int memman_total(struct MEMMAN *man);
 unsigned int memman_alloc(struct MEMMAN *man,unsigned int size);
+unsigned int memman_alloc_4k(struct MEMMAN *man,unsigned int size);
 int memman_free(struct MEMMAN *man,unsigned int addr,unsigned int size);
+int memman_free_4k(struct MEMMAN *man,unsigned int addr,unsigned int size);
 
 //graphic.c
 
@@ -166,4 +168,30 @@ int fifo8_put(struct FIFO8 *fifo,unsigned char data);
 int fifo8_get(struct FIFO8 *fifo);
 int fifo8_status(struct FIFO8 *fifo);
 
-#define FLAGS_OVERRUN	0x0001;
+#define FLAGS_OVERRUN	0x0001
+
+//sheet.c
+
+#define MAX_SHEETS				256
+#define SHEET_USE				1
+
+struct SHEET{
+	unsigned char *buf;//图层上所描画的内容的地址
+	int bxsize,bysize,vx0,vy0,col_inv,height,flags;
+};
+
+struct SHTCTL{
+	unsigned char *vram;
+	int xsize,ysize,top;//top为顶端图层的高度
+	struct SHEET *sheets[MAX_SHEETS];
+	struct SHEET sheets0[MAX_SHEETS];
+};
+
+struct SHTCTL *shtctl_init(struct MEMMAN *memman,unsigned char *vram,int xsize,int ysize);
+struct SHEET *sheet_alloc(struct SHTCTL *ctl);
+void sheet_setbuf(struct SHEET *sht,unsigned char *buf,int xsize,int ysize,int col_inv);
+void sheet_updown(struct SHTCTL *ctl,struct SHEET *sht,int height);
+void sheet_refresh(struct SHTCTL *ctl,struct SHEET *sht,int bx0,int by0,int bx1,int by1);
+void sheet_refreshsub(struct SHTCTL *ctl,int vx0,int vy0,int vx1,int vy1);
+void sheet_slide(struct SHTCTL *ctl,struct SHEET *sht,int vx0,int vy0);
+void sheet_free(struct SHTCTL *ctl,struct SHEET *sht);
